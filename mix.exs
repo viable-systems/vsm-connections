@@ -48,9 +48,6 @@ defmodule VsmConnections.MixProject do
 
   defp deps do
     [
-      # Core VSM dependencies
-      {:vsm_core, path: "../vsm-core"},
-      
       # HTTP client and connection pooling
       {:finch, "~> 0.18"},
       {:poolboy, "~> 1.5"},
@@ -66,7 +63,6 @@ defmodule VsmConnections.MixProject do
       
       # Circuit breaker pattern
       {:fuse, "~> 2.5"},
-      {:circuit_breaker, "~> 0.5"},
       
       # Health checking and monitoring
       {:telemetry, "~> 1.2"},
@@ -75,19 +71,15 @@ defmodule VsmConnections.MixProject do
       
       # Redis integration
       {:redix, "~> 1.3"},
-      {:redix_cluster, "~> 1.0"},
       
       # JSON handling
       {:jason, "~> 1.4"},
-      {:poison, "~> 5.0"},
       
       # Time and scheduling
       {:quantum, "~> 3.5"},
-      {:crontab, "~> 1.1"},
       
       # Retry mechanisms
       {:retry, "~> 0.18"},
-      {:exponential_backoff, "~> 1.1"},
       
       # Async processing
       {:broadway, "~> 1.0"},

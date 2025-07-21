@@ -196,8 +196,8 @@ defmodule VsmConnections.Redis do
   
   ## Examples
   
-      {:ok, subscription} = VsmConnections.Redis.subscribe("events", fn message ->
-        IO.puts("Received: #{inspect(message)}")
+      {:ok, subscription} = VsmConnections.Redis.subscribe("events", fn _message ->
+        :ok
       end)
       
       {:ok, subscription} = VsmConnections.Redis.subscribe(["events", "alerts"], &handle_message/1)
@@ -212,8 +212,8 @@ defmodule VsmConnections.Redis do
   
   ## Examples
   
-      {:ok, subscription} = VsmConnections.Redis.psubscribe("events:*", fn message ->
-        IO.puts("Pattern match: #{inspect(message)}")
+      {:ok, subscription} = VsmConnections.Redis.psubscribe("events:*", fn _message ->
+        :ok
       end)
   """
   @spec psubscribe(String.t() | [String.t()], function()) :: {:ok, pid()} | {:error, term()}

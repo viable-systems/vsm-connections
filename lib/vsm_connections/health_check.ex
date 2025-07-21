@@ -388,11 +388,12 @@ defmodule VsmConnections.HealthCheck do
            headers: headers,
            timeout: timeout
          ) do
-      {:ok, %{status: status}} when status in expected_status ->
-        :ok
-      
       {:ok, %{status: status}} ->
-        {:error, {:unexpected_status, status}}
+        if status in expected_status do
+          :ok
+        else
+          {:error, {:unexpected_status, status}}
+        end
       
       {:error, reason} ->
         {:error, reason}

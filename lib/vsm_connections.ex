@@ -227,8 +227,8 @@ defmodule VsmConnections do
   
   ## Examples
   
-      {:ok, subscription} = VsmConnections.redis_subscribe("events", fn message ->
-        IO.puts("Received: #{inspect(message)}")
+      {:ok, subscription} = VsmConnections.redis_subscribe("events", fn _message ->
+        :ok
       end)
   """
   @spec redis_subscribe(String.t(), function()) :: {:ok, pid()} | {:error, term()}

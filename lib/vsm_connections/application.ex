@@ -26,8 +26,8 @@ defmodule VsmConnections.Application do
       # Configuration manager
       VsmConnections.Config,
       
-      # Telemetry and metrics
-      {TelemetryMetrics.Supervisor, telemetry_metrics()},
+      # Telemetry and metrics  
+      {TelemetryMetrics.Supervisor, metrics: telemetry_metrics()},
       {Telemetry.Poller, telemetry_poller_opts()},
       
       # Core infrastructure supervisors
@@ -133,9 +133,10 @@ defmodule VsmConnections.Application do
 
   # Finch connection pools configuration
   defp finch_pools do
-    config = VsmConnections.Config.get(:pools, %{})
+    # Use Application.get_env instead of the Config module during startup
+    config = Application.get_env(:vsm_connections, :pools, %{})
     
-    Enum.map(config, fn {pool_name, pool_config} ->
+    Enum.map(config, fn {_pool_name, pool_config} ->
       {String.to_atom(pool_config[:host] || "localhost"), 
        pool_config
        |> Map.put(:size, pool_config[:size] || 10)

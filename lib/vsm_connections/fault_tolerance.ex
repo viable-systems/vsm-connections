@@ -47,8 +47,8 @@ defmodule VsmConnections.FaultTolerance do
       end, 
         max_attempts: 3,
         retryable_errors: [:timeout, :service_unavailable],
-        on_retry: fn attempt, error ->
-          Logger.warn("Retry attempt #{attempt}: #{inspect(error)}")
+        on_retry: fn _attempt, _error ->
+          :ok
         end
       )
   """
@@ -212,20 +212,20 @@ defmodule VsmConnections.FaultTolerance do
       {:ok, result}
     rescue
       error ->
-        handle_retry_error({:error, error}, options, attempt)
+        handle_retry_error({:error, error}, fun, options, attempt)
     catch
       :exit, reason ->
-        handle_retry_error({:error, {:exit, reason}}, options, attempt)
+        handle_retry_error({:error, {:exit, reason}}, fun, options, attempt)
       
       :throw, value ->
-        handle_retry_error({:error, {:throw, value}}, options, attempt)
+        handle_retry_error({:error, {:throw, value}}, fun, options, attempt)
       
       kind, reason ->
-        handle_retry_error({:error, {kind, reason}}, options, attempt)
+        handle_retry_error({:error, {kind, reason}}, fun, options, attempt)
     end
   end
 
-  defp handle_retry_error({:error, error}, options, attempt) do
+  defp handle_retry_error({:error, error}, fun, options, attempt) do
     emit_attempt_telemetry(:error, attempt, options, error)
     
     cond do
@@ -242,7 +242,7 @@ defmodule VsmConnections.FaultTolerance do
         call_retry_callback(options, attempt, error)
         
         :timer.sleep(delay)
-        execute_with_retry(options.function || fun, options, attempt + 1)
+        execute_with_retry(fun, options, attempt + 1)
     end
   end
 
