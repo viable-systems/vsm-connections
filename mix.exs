@@ -66,7 +66,7 @@ defmodule VsmConnections.MixProject do
       
       # Health checking and monitoring
       {:telemetry, "~> 1.2"},
-      {:telemetry_metrics, "~> 0.6"},
+      {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       
       # Redis integration
@@ -99,7 +99,27 @@ defmodule VsmConnections.MixProject do
       
       # Benchmarking
       {:benchee, "~> 1.1", only: [:dev, :test]}
-    ]
+    ] ++ vsm_deps()
+  end
+  
+  defp vsm_deps do
+    if in_umbrella?() do
+      [
+        {:vsm_core, in_umbrella: true}
+      ]
+    else
+      [
+        {:vsm_core, path: "../vsm-core"}
+      ]
+    end
+  end
+  
+  defp in_umbrella? do
+    # Check if we're being compiled as part of an umbrella project
+    case System.get_env("MIX_BUILD_PATH") do
+      nil -> false
+      path -> String.contains?(path, "_build/#{Mix.env()}/lib")
+    end
   end
 
   defp description do
