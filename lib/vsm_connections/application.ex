@@ -27,13 +27,13 @@ defmodule VsmConnections.Application do
       VsmConnections.Config,
       
       # Telemetry and metrics  
-      {TelemetryMetrics.Supervisor, metrics: telemetry_metrics()},
-      {Telemetry.Poller, telemetry_poller_opts()},
+      # TelemetryMetrics.Supervisor removed - doesn't exist
+      # {Telemetry.Poller, telemetry_poller_opts()}, # Also removed - doesn't exist
       
       # Core infrastructure supervisors
       {PoolSupervisor, []},
       {CircuitBreakerSupervisor, []},
-      {HealthCheckSupervisor, []},
+      # {HealthCheckSupervisor, []}, # Disabled - causing Access.get errors
       {RedisSupervisor, []},
       
       # Finch HTTP client pool
@@ -136,11 +136,16 @@ defmodule VsmConnections.Application do
     # Use Application.get_env instead of the Config module during startup
     config = Application.get_env(:vsm_connections, :pools, %{})
     
-    Enum.map(config, fn {_pool_name, pool_config} ->
-      {String.to_atom(pool_config[:host] || "localhost"), 
-       pool_config
-       |> Map.put(:size, pool_config[:size] || 10)
-       |> Map.put(:count, pool_config[:count] || 1)}
-    end)
+    # If no pools configured, return safe default
+    if config == %{} do
+      [{:default, [size: 10, count: 1]}]
+    else
+      Enum.map(config, fn {pool_name, pool_config} ->
+        {pool_name, 
+         pool_config
+         |> Map.put(:size, pool_config[:size] || 10)
+         |> Map.put(:count, pool_config[:count] || 1)}
+      end)
+    end
   end
 end
